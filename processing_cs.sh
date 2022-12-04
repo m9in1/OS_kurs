@@ -1,5 +1,5 @@
 #!/bin/bash
-function maximum{
+function maximum {
 	local m=$1
 
 	local n=$1
@@ -9,7 +9,7 @@ function maximum{
 	n=$3
 	if [ "$n" -gt "$m" ]; then m=$n; fi
 	
-return $m
+	echo $m
 }
 
 while read line; do
@@ -19,20 +19,19 @@ while read line; do
 	G=${my_array[2]}
 	B=${my_array[3]}
 
-	max=$maximum $R $G $B
-	echo ${max}
-	if [ $R -eq $max ] 
+	max=$(maximum $R $G $B)
+	if [[ $R==$max ]] 
 	then
-		maxRGB=R
+		 echo "R" > color_data
 	fi
-	if [ $G -eq $max ]
+	if [[ $G==$max ]]
 	then
-		maxRGB=G
+		 echo "G" > color_data
 	fi
-	if [ $B -eq $max ] 
+	if [[ $B==$max ]] 
 	then
-		maxRGB=B
+		echo "B" > color_data
+
 	fi
 
-	echo $maxRGB > tempfile
 done

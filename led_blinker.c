@@ -197,19 +197,19 @@ int main(int argc, char *argv[])
 		GPIOWrite(LEDR, 1);
 		GPIOWrite(LEDY, 0);
 		GPIOWrite(LEDG, 0);
-		printf("Light:R\n");
+		printf("R\n");
 		fflush(stdout);
 		usleep(delay);
 		GPIOWrite(LEDR, 0);
 		GPIOWrite(LEDY, 1);
 		GPIOWrite(LEDG, 0);
-		printf("Light:Y\n");
+		printf("Y\n");
 		fflush(stdout);
 		usleep(delay);
 		GPIOWrite(LEDR, 0);
 		GPIOWrite(LEDY, 0);
 		GPIOWrite(LEDG, 1);
-		printf("Light:G\n");
+		printf("G\n");
 		fflush(stdout);
 		usleep(delay);
 	}

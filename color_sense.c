@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 			fflush(stdout);
 		} else
 			while (1) {
-				printf(" %d %d %d \n", red, green, blue);
+				printf("code: %d %d %d \n", red, green, blue);
 				fflush(stdout);
 				usleep(SLEEP_TIME * 20000);
 			}
