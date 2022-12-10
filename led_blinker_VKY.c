@@ -241,9 +241,9 @@ int main(int argc, char *argv[])
 	sleep(0.5);
 	double delay_temp=delay;
 	////////////////////////////////
-	bool ledr_value=1;
-	bool ledy_value=0;
-	bool ledg_value=0;
+	int ledr_value=1;
+	int ledy_value=0;
+	int ledg_value=0;
 	while(1){
 		GPIOWrite(LEDR, ledr_value);
 		GPIOWrite(LEDY, ledy_value);

@@ -70,7 +70,8 @@ int main(int argc, char *argv[])
 	
 	// Open fifo
 	char* path = argv[2];
-	FILE *color_data_file=fopen(path,"r+");
+	//FILE *color_data_file=fopen(path,"r+");
+	int color_data_file = open(path, O_RDWR);
 	
 	// Create I2C bus
 	int file;
