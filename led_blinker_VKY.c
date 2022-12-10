@@ -170,12 +170,17 @@ void Exiting_sig()
 
 
 void user_sleep(double delay){
+	int delta = 180000;
+	delay = delay-delta;
 	int btn0_value = GPIORead(BTN0);
+	int btn0_flag=0;
 	int cntr_delay = 0;
-	int _count_part = 100;
+	const int _count_part = 1000;
 	double part_delay = delay/_count_part;
 	while(cntr_delay<_count_part || btn0_value!=0){
 		usleep(part_delay);
+		btn0_value = GPIORead(BTN0);
+		++cntr_delay;
 	}
 
 }

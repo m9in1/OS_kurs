@@ -60,6 +60,14 @@ int main(int argc, char *argv[])
 		}
 	}
 	
+	/////
+	struct timespec mt1, mt2; 
+   //Переменная для расчета дельты времени
+   	long int tt;    
+	clock_gettime (CLOCK_REALTIME, &mt1);
+	//////
+	
+	
 	// Open fifo
 	char* path = argv[2];
 	FILE *color_data_file=fopen(path,"r+");
@@ -128,6 +136,8 @@ int main(int argc, char *argv[])
                 write(color_data_file,colors[ind],1);
 		
 		// Output data to screen
+		clock_gettime (CLOCK_REALTIME, &mt2);
+		tt=1000000000*(mt2.tv_sec - mt1.tv_sec)+(mt2.tv_nsec - mt1.tv_nsec);
 		if (!quiet) {
 			printf("Red color luminance : %d lux \n", red);
 			printf("Green color luminance : %d lux \n", green);
@@ -135,10 +145,13 @@ int main(int argc, char *argv[])
 			printf("IR luminance : %d lux \n", cData);
 			printf("Ambient Light Luminance : %.2f lux \n",
 			       luminance);
+			printf("Time from program start: %ld ns\n", tt);
 			fflush(stdout);
 		} else
 			while (1) {
-				printf("code: %d %d %d",red, green, blue);
+				clock_gettime (CLOCK_REALTIME, &mt2);
+				tt=1000000000*(mt2.tv_sec - mt1.tv_sec)+(mt2.tv_nsec - mt1.tv_nsec);
+				printf("code: %d %d %d, time from program start: %ld ns\n",red, green, blue, tt);
 				fflush(stdout);
 				usleep(SLEEP_TIME * 20000);
 			}
