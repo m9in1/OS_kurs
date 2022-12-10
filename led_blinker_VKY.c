@@ -167,6 +167,20 @@ void Exiting_sig()
 	exit(0);
 }
 
+
+
+void user_sleep(double delay){
+	int btn0_value = GPIORead(BTN0);
+	int cntr_delay = 0;
+	int _count_part = 100;
+	double part_delay = delay/_count_part;
+	while(cntr_delay<_count_part || btn0_value!=0){
+		usleep(part_delay);
+	}
+
+}
+
+
 void help()
 {
 	printf("    Use this application for blinking\n");
@@ -176,6 +190,10 @@ void help()
 	printf("    -h - help\n");
 	printf("    -q - quiet\n");
 }
+
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -217,7 +235,37 @@ int main(int argc, char *argv[])
 
 	sleep(0.5);
 	double delay_temp=delay;
-	while (1) {
+	////////////////////////////////
+	bool ledr_value=1;
+	bool ledy_value=0;
+	bool ledg_value=0;
+	while(1){
+		GPIOWrite(LEDR, ledr_value);
+		GPIOWrite(LEDY, ledy_value);
+		GPIOWrite(LEDG, ledg_value);
+		if(ledr_value==1){
+			ledr_value=0;
+			ledy_value=1;
+			ledg_value=0;
+			printf("R\n");
+		}
+		if(ledy_value==1){
+			ledr_value=0;
+			ledy_value=0;
+			ledg_value=1;
+			printf("Y\n");
+		}
+		if(ledg_value==1){
+			ledr_value=1;
+			ledy_value=0;
+			ledg_value=0;
+			printf("G\n");
+		}
+		user_sleep(delay);
+	}
+	
+	////////////////////////////////
+	/*while (1) {
 		GPIOWrite(LEDR, 1);
 		GPIOWrite(LEDY, 0);
 		GPIOWrite(LEDG, 0);
@@ -237,6 +285,6 @@ int main(int argc, char *argv[])
 		printf("G\n");
 		fflush(stdout);
 		usleep(delay);
-	}
+	}*/
 	return 0;
 }
