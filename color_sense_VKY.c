@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 			quiet = 1;
 		}
 	}
+	
 	// Open fifo
 	char* path = argv[2];
 	FILE *color_data_file=fopen(path,"r+");
@@ -113,6 +114,7 @@ int main(int argc, char *argv[])
 		if (luminance < 0) {
 			luminance = 0;
 		}
+		
 		//Writing highest color to color_data
 		int cur[3]={red,green,blue};
                 int max=cur[0];

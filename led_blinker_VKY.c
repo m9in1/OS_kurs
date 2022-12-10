@@ -41,6 +41,7 @@
 #define LEDR 24
 #define LEDY 10
 #define LEDG 9
+#define BTN0 22
 //***************************//
 #define VALUE_MAX 30
 
@@ -133,6 +134,23 @@ static int GPIOWrite(int pin, int value)
 	return (0);
 }
 
+////////////////////////////////////////
+int GPIORead(int pin){
+	int value;
+	char buffer[10];
+	char path[VALUE_MAX];
+	int fd;
+	snprintf(path, VALUE_MAX, "/sys/class/gpio/gpio%d/value",pin);
+	fd = open(path,O_RDONLY);
+	if(fd==-1){
+		fprintf(stderr, "Failed to open for reading\n");
+		Exiting(-1);
+	}
+	int n = read(fd, buffer, sizeof(buffer));
+	value = atoi(buffer);		
+	return value;
+}
+////////////////////////////////////////////
 void Exiting(int parameter)
 {
 	GPIOUnexport(LEDR);
@@ -188,17 +206,24 @@ int main(int argc, char *argv[])
 	GPIOExport(LEDR);
 	GPIOExport(LEDY);
 	GPIOExport(LEDG);
+	///////////////////
+	GPIOExport(BTN0);
+	//////////////////
 	GPIODirection(LEDR, OUT);
 	GPIODirection(LEDY, OUT);
 	GPIODirection(LEDG, OUT);
+	//////////////////
+	GPIODirection(BTN0, IN);
 
 	sleep(0.5);
+	double delay_temp=delay;
 	while (1) {
 		GPIOWrite(LEDR, 1);
 		GPIOWrite(LEDY, 0);
 		GPIOWrite(LEDG, 0);
 		printf("R\n");
 		fflush(stdout);
+		
 		usleep(delay);
 		GPIOWrite(LEDR, 0);
 		GPIOWrite(LEDY, 1);
