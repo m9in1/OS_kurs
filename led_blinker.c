@@ -171,7 +171,7 @@ void Exiting_sig()
 
 
 
-void user_sleep(double delay){
+/*void user_sleep(double delay){
 	int delta = 180000;
 	delay = delay-delta;
 //	printf("%d\n", GPIORead(BTN0));
@@ -192,7 +192,7 @@ void user_sleep(double delay){
 	} 
 
 }
-
+*/
 
 void help()
 {
@@ -234,6 +234,11 @@ int main(int argc, char *argv[])
 		argument++;
 	double delay = atof(argv[argument]) * 1000000;
 	signal(SIGINT, Exiting_sig);
+	////////////////////time
+	struct timespec mt;
+	
+	
+	
 	GPIOExport(LEDR);
 	GPIOExport(LEDY);
 	GPIOExport(LEDG);
@@ -255,44 +260,48 @@ int main(int argc, char *argv[])
 	int btn0_flag=0;
 	while(1){
 		if(GPIORead(BTN0)==1){
-		flag_ryg=0;
-		btn0_flag=0;
-		GPIOWrite(LEDR, ledr_value);
-		GPIOWrite(LEDY, ledy_value);
-		GPIOWrite(LEDG, ledg_value);
-//		printf("%d\n",	GPIORead(LEDR));
-		if(ledg_value==1&&flag_ryg==0){
-                        ledr_value=1;
-                        ledy_value=0;
-                        ledg_value=0;
-			flag_ryg=1;
-                        printf("G\n");
-                }
-		if(ledy_value==1&&flag_ryg==0){
-                        ledr_value=0;
-                        ledy_value=0;
-                        ledg_value=1;
-			flag_ryg=1;
-                        printf("Y\n");
-                }
-
-
-		if(ledr_value==1&&flag_ryg==0){
-			ledr_value=0;
-			ledy_value=1;
-			ledg_value=0;
-			flag_ryg=1;
-			printf("R\n");
-		}
-//		usleep(delay);
-		user_sleep(delay);}
-		 else{
-			if(btn0_flag==0){
+			flag_ryg=0;
+			btn0_flag=0;
 			GPIOWrite(LEDR, ledr_value);
-			GPIOWrite(LEDG, ledg_value);
 			GPIOWrite(LEDY, ledy_value);
-			btn0_flag=1;
+			GPIOWrite(LEDG, ledg_value);
+			clock_gettime(CLOCK_REALTIME, &mt);
+	//		printf("%d\n",	GPIORead(LEDR));
+			if(ledg_value==1&&flag_ryg==0){
+		                ledr_value=1;
+		                ledy_value=0;
+		                ledg_value=0;
+				flag_ryg=1;
+		                printf("G, time: %d sec\n", mt.tv_sec);
+		                fflush(stdout);
+		        }
+			if(ledy_value==1&&flag_ryg==0){
+		                ledr_value=0;
+		                ledy_value=0;
+		                ledg_value=1;
+				flag_ryg=1;
+		                printf("Y, time: %d sec\n", mt.tv_sec);
+		                fflush(stdout);
+		        }
+
+
+			if(ledr_value==1&&flag_ryg==0){
+				ledr_value=0;
+				ledy_value=1;
+				ledg_value=0;
+				flag_ryg=1;
+				printf("R, time: %d sec\n", mt.tv_sec);        
+				fflush(stdout);
 			}
+
+			}
+			 else{
+				if(btn0_flag==0){
+				GPIOWrite(LEDR, ledr_value);
+				GPIOWrite(LEDG, ledg_value);
+				GPIOWrite(LEDY, ledy_value);
+				btn0_flag=1;
+				}
 	//	usleep(50000);
 }
 	}
