@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Sergey Balabaev (sergei.a.balabaev@gmail.com)                    *
+ * Copyright (c) 2022 Sergey Balabaev (sergei.a.balabaev@gmail.com)            *
  *                                                                             *
  * The MIT License (MIT):                                                      *
  * Permission is hereby granted, free of charge, to any person obtaining a     *
@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+
 #define SLEEP_TIME 100
 
 void help()
@@ -59,23 +60,17 @@ int main(int argc, char *argv[])
 			quiet = 1;
 		}
 	}
-	
-	/////
-	struct timespec mt1, mt2; 
-   //Переменная для расчета дельты времени
-   	long int tt;    
-	clock_gettime (CLOCK_REALTIME, &mt1);
-	//////
-	
-	
 	// Open fifo
-	char* path = argv[2];
-	//FILE *color_data_file=fopen(path,"r+");
+	char* path = argv[2]; 	
+//	char* path ="./color_data";
+	
 	int color_data_file = open(path, O_RDWR);
 	if(color_data_file==-1){
-		printf("Can't open fifo file\n");
+		printf("Can't open\n");
 		exit(-1);
 	}
+	struct timespec mt;
+
 	// Create I2C bus
 	int file;
 	char *bus = "/dev/i2c-1";
@@ -109,57 +104,60 @@ int main(int argc, char *argv[])
 	sleep(1);
 	// Read 8 bytes of data from register(0x94)
 	// cData lsb, cData msb, red lsb, red msb, green lsb, green msb, blue lsb, blue msb
-	char reg[1] = { 0x94 };
-	write(file, reg, 1);
-	char data[8] = { 0 };
-	if (read(file, data, 8) != 8) {
-		printf("Erorr : Input/output Erorr \n");
-	} else {
-		// Convert the data
-		int cData = (data[1] * 256 + data[0]);
-		int red = (data[3] * 256 + data[2]);
-		int green = (data[5] * 256 + data[4]);
-		int blue = (data[7] * 256 + data[6]);
-		// Calculate luminance
-		float luminance = (-0.32466) * (red) + (1.57837) * (green) +
-				  (-0.73191) * (blue);
-		if (luminance < 0) {
-			luminance = 0;
-		}
-		
-		//Writing highest color to color_data
-		int cur[3]={red,green,blue};
-                int max=cur[0];
-                int ind=0;
-                char colors[3] = "RGB";
-                for(int i=0;i<3;i++){
-                	if(max<cur[i]){
-                        	ind=i;
-                                max=cur[i];}
-                                }
-                write(color_data_file,colors[ind],1);
-		
-		// Output data to screen
-		clock_gettime (CLOCK_REALTIME, &mt2);
-		tt=1000000000*(mt2.tv_sec - mt1.tv_sec)+(mt2.tv_nsec - mt1.tv_nsec);
-		if (!quiet) {
-			printf("Red color luminance : %d lux \n", red);
-			printf("Green color luminance : %d lux \n", green);
-			printf("Blue color luminance : %d lux \n", blue);
-			printf("IR luminance : %d lux \n", cData);
-			printf("Ambient Light Luminance : %.2f lux \n",
-			       luminance);
-			printf("Time from program start: %ld ns\n", tt);
-			fflush(stdout);
-		} else
-			while (1) {
-				write(color_data_file,colors[ind],1);
-				printf("%d\n", ind);
-				clock_gettime (CLOCK_REALTIME, &mt2);
-				tt=1000000000*(mt2.tv_sec - mt1.tv_sec)+(mt2.tv_nsec - mt1.tv_nsec);
-				printf("code: %d %d %d, time from program start: %ld ns\n",red, green, blue, tt);
+
+	while (1) {
+		char reg[1] = { 0x94 };
+		write(file, reg, 1);
+		char data[8] = { 0 };
+		if (read(file, data, 8) != 8) {
+			printf("Erorr : Input/output Erorr \n");
+		} else {
+			// Convert the data
+			int cData = (data[1] * 256 + data[0]);
+			int red = (data[3] * 256 + data[2]);
+			int green = (data[5] * 256 + data[4]);
+			int blue = (data[7] * 256 + data[6]);
+			// Calculate luminance
+			float luminance = (-0.32466) * (red) +
+					  (1.57837) * (green) +
+					  (-0.73191) * (blue);
+			if (luminance < 0) {
+				luminance = 0;
+			}
+			int cur[3] = {red,green,blue};
+			int max = cur[0];
+			int ind=0;
+		//	const char colors[5] = "RGB\n";
+			for(int i = 0; i<3; i++){
+				if(max<cur[i]){
+					ind = i;
+					max = cur[i];
+				}
+			}
+			char* color_temp;
+			if(ind==0)color_temp="R\n";
+			if(ind==1)color_temp="G\n";
+			if(ind==2)color_temp="B\n";
+			// Output data to screen
+			if (!quiet) {
+				printf("Red color luminance : %d lux \n", red);
+				printf("Green color luminance : %d lux \n",
+				       green);
+				printf("Blue color luminance : %d lux \n",
+				       blue);
+				printf("IR luminance : %d lux \n", cData);
+				printf("Ambient Light Luminance : %.2f lux \n",
+				       luminance);
+				fflush(stdout);
+				break;
+			} else {
+				clock_gettime(CLOCK_REALTIME, &mt);
+				
+				write(color_data_file, color_temp, 3);
+				printf("code: %d %d %d, time: %d sec\n", red, green, blue, mt.tv_sec);
 				fflush(stdout);
 				usleep(SLEEP_TIME * 20000);
 			}
+		}
 	}
 }

@@ -156,6 +156,7 @@ void Exiting(int parameter)
 	GPIOUnexport(LEDR);
 	GPIOUnexport(LEDY);
 	GPIOUnexport(LEDG);
+	GPIOUnexport(BTN0);
 	exit(parameter);
 }
 
@@ -164,6 +165,7 @@ void Exiting_sig()
 	GPIOUnexport(LEDR);
 	GPIOUnexport(LEDY);
 	GPIOUnexport(LEDG);
+	GPIOUnexport(BTN0);
 	exit(0);
 }
 
@@ -172,16 +174,22 @@ void Exiting_sig()
 void user_sleep(double delay){
 	int delta = 180000;
 	delay = delay-delta;
-	int btn0_value = GPIORead(BTN0);
+//	printf("%d\n", GPIORead(BTN0));
+//	int btn0_value = GPIORead(BTN0);
 	int btn0_flag=0;
 	int cntr_delay = 0;
-	const int _count_part = 1000;
+	const int _count_part = 100;
 	double part_delay = delay/_count_part;
-	while(cntr_delay<_count_part || btn0_value!=0){
-		usleep(part_delay);
-		btn0_value = GPIORead(BTN0);
-		++cntr_delay;
-	}
+	while(cntr_delay<_count_part){
+		if(GPIORead(BTN0)==1){
+			usleep(part_delay);
+		//btn0_value = GPIORead(BTN0);
+			++cntr_delay;
+		}else{
+			usleep(1000);
+			break;
+		}
+	} 
 
 }
 
@@ -239,34 +247,54 @@ int main(int argc, char *argv[])
 	GPIODirection(BTN0, IN);
 
 	sleep(0.5);
-	double delay_temp=delay;
 	////////////////////////////////
 	int ledr_value=1;
 	int ledy_value=0;
 	int ledg_value=0;
+	int flag_ryg=0;
+	int btn0_flag=0;
 	while(1){
+		if(GPIORead(BTN0)==1){
+		flag_ryg=0;
+		btn0_flag=0;
 		GPIOWrite(LEDR, ledr_value);
 		GPIOWrite(LEDY, ledy_value);
 		GPIOWrite(LEDG, ledg_value);
-		if(ledr_value==1){
+//		printf("%d\n",	GPIORead(LEDR));
+		if(ledg_value==1&&flag_ryg==0){
+                        ledr_value=1;
+                        ledy_value=0;
+                        ledg_value=0;
+			flag_ryg=1;
+                        printf("G\n");
+                }
+		if(ledy_value==1&&flag_ryg==0){
+                        ledr_value=0;
+                        ledy_value=0;
+                        ledg_value=1;
+			flag_ryg=1;
+                        printf("Y\n");
+                }
+
+
+		if(ledr_value==1&&flag_ryg==0){
 			ledr_value=0;
 			ledy_value=1;
 			ledg_value=0;
+			flag_ryg=1;
 			printf("R\n");
 		}
-		if(ledy_value==1){
-			ledr_value=0;
-			ledy_value=0;
-			ledg_value=1;
-			printf("Y\n");
-		}
-		if(ledg_value==1){
-			ledr_value=1;
-			ledy_value=0;
-			ledg_value=0;
-			printf("G\n");
-		}
-		user_sleep(delay);
+//		usleep(delay);
+		user_sleep(delay);}
+		 else{
+			if(btn0_flag==0){
+			GPIOWrite(LEDR, ledr_value);
+			GPIOWrite(LEDG, ledg_value);
+			GPIOWrite(LEDY, ledy_value);
+			btn0_flag=1;
+			}
+	//	usleep(50000);
+}
 	}
 	
 	////////////////////////////////
