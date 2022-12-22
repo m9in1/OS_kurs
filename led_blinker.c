@@ -293,7 +293,7 @@ int main(int argc, char *argv[])
 				printf("R, time: %d sec\n", mt.tv_sec);        
 				fflush(stdout);
 			}
-
+			usleep(0.5);
 			}
 			 else{
 				if(btn0_flag==0){
@@ -301,7 +301,9 @@ int main(int argc, char *argv[])
 				GPIOWrite(LEDG, ledg_value);
 				GPIOWrite(LEDY, ledy_value);
 				btn0_flag=1;
+				usleep(0.5);
 				}
+				
 	//	usleep(50000);
 }
 	}
